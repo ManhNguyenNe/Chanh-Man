@@ -24,6 +24,13 @@ Nhật ký ghi nhận công việc thực tế sau mỗi đợt code. Mục mớ
 
 ## Nhật ký thay đổi
 
+### Đợt 020 — 30/09/2026 — Tạo repository GitHub Chanh-Man
+
+**Đã thực hiện:** tạo repository riêng tư [ManhNguyenNe/Chanh-Man](https://github.com/ManhNguyenNe/Chanh-Man) cho dự án test_proj. Tên URL dùng dấu gạch nối vì GitHub không hỗ trợ dấu &; tên dự án vẫn là Chanh&Man. Thiết lập origin và chuẩn bị push nhánh main.
+
+**Kiểm tra:** API GitHub xác nhận repository đúng tài khoản ManhNguyenNe và private=true. Mã nguồn không thay đổi; không chạy lại lint/build. Kết quả push và đối chiếu commit local/remote được báo trong phiên bàn giao sau khi lệnh hoàn tất.
+
+
 ### Đợt 019 — 30/09/2026 — Chuẩn bị repository Git
 
 **Đã thực hiện:** khởi tạo Git với nhánh main; bổ sung .gitignore loại file môi trường và bộ cài .msix, tiếp tục bỏ node_modules/dist. Chuẩn bị commit mã nguồn, tài nguyên và tài liệu dự án để đưa lên GitHub.
@@ -282,6 +289,7 @@ Mục này được ghi bổ sung ngày 09/09/2026, dựa trên code hiện có,
 **Ảnh xem trước:** [Màn hình đầu trang](./docs/previews/home-hero.png), [Desktop](./docs/previews/home-desktop.png), [Tablet](./docs/previews/home-tablet.png), [Mobile](./docs/previews/home-mobile.png).
 
 **Chưa thực hiện / hướng tiếp tục:** xây các trang danh sách và chi tiết riêng, tài khoản, checkout, đơn hàng và quản trị theo [FE_PLAN.md](./FE_PLAN.md). Database, Auth và tích hợp Supabase thực hiện sau khi hoàn thiện FE theo phạm vi thống nhất.
+
 
 
 
