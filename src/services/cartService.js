@@ -1,12 +1,17 @@
-import { findVariant } from './productService'
+import { findVariant } from './productService.js'
 const key = 'chanh-man:cart:v1'
-function readItems() {
+function readItems(notices = []) {
   try {
     const data = JSON.parse(localStorage.getItem(key) || '[]')
     if (!Array.isArray(data)) return []
     const merged = new Map()
     for (const item of data) {
       const match = findVariant(item?.variantId)
+      if (!match || match.variant.stock < 1) {
+        notices.push('Một phiên bản không còn bán hoặc đã hết hàng được bỏ khỏi giỏ.')
+      } else if (Number.isInteger(item.quantity) && item.quantity > match.variant.stock) {
+        notices.push(`${match.product.name}: số lượng được giảm về ${match.variant.stock} theo tồn kho hiện tại.`)
+      }
       if (match && Number.isInteger(item.quantity) && item.quantity > 0 && match.variant.stock > 0)
         merged.set(
           item.variantId,
@@ -23,6 +28,7 @@ function summarize(items) {
     const { product, variant } = findVariant(item.variantId)
     return {
       ...item,
+      productId: product.id,
       name: product.name,
       image: product.image,
       label: variant.label,
@@ -47,7 +53,8 @@ function save(items) {
   return summarize(items)
 }
 export async function getCart() {
-  return summarize(readItems())
+  const notices = []
+  return { ...summarize(readItems(notices)), notices: [...new Set(notices)] }
 }
 export async function addItem(variantId) {
   const match = findVariant(variantId)

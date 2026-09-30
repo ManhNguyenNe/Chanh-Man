@@ -1,0 +1,35 @@
+.cart-page { background: var(--parchment); padding-block: var(--space-lg) var(--space-section); }
+.cart-page .ant-breadcrumb { font-size: 14px; }
+.cart-page-heading { background: var(--canvas); border-radius: var(--radius-lg); padding: var(--space-md) var(--space-lg); margin-block: var(--space-md) var(--space-lg); }
+.cart-page-heading h1 { font-size: 40px; line-height: 1.1; letter-spacing: -0.28px; margin-bottom: var(--space-xs); }
+.cart-page-heading h1 span { color: var(--primary); }
+.cart-page-heading > p:last-child { color: var(--secondary); }
+.cart-page-notice { padding: var(--space-lg); margin-bottom: var(--space-lg); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.cart-page-notice h2 { font-size: 17px; margin-bottom: var(--space-xs); }
+.cart-page-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--space-lg); align-items: start; }
+.cart-page-panel { min-width: 0; background: var(--canvas); border-radius: var(--radius-lg); padding: var(--space-lg); }
+.cart-page-panel > .text-action { margin-top: var(--space-lg); }
+.cart-page-summary { display: grid; gap: var(--space-lg); }
+.cart-page-summary h2 { font-size: 24px; }
+.cart-page-summary dl { margin: 0; display: grid; gap: var(--space-md); }
+.cart-page-summary dl > div { display: flex; justify-content: space-between; gap: var(--space-sm); }
+.cart-page-summary dd { margin: 0; text-align: right; font-weight: 600; }
+.cart-page-summary dl > div:nth-child(2) { padding-block: var(--space-md); border-block: 1px solid var(--border); }
+.cart-page .cart-item { grid-template-columns: 140px minmax(0, 1fr); }
+.cart-page .cart-item img { width: 140px; height: 112px; }
+.cart-page .cart-item h3 { font-size: 21px; overflow-wrap: anywhere; }
+.cart-page .cart-item strong { font-size: 17px; }
+@media (max-width: 833px) {
+  .cart-page-layout { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .cart-page-panel, .cart-page-heading { padding: var(--space-md); }
+  .cart-page { padding-bottom: var(--space-xxl); }
+  .cart-page-heading h1 { font-size: 34px; }
+  .cart-page .cart-item { grid-template-columns: 80px minmax(0, 1fr); gap: var(--space-sm); }
+  .cart-page .cart-item img { width: 80px; height: 80px; }
+  .cart-page .cart-item h3 { font-size: 17px; line-height: 1.47; }
+}
+@media (max-width: 419px) {
+  .cart-page-heading h1 { font-size: 28px; }
+}

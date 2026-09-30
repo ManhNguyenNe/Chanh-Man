@@ -1,6 +1,6 @@
 # Tiến trình dự án Chanh&Man
 
-Cập nhật gần nhất: **30/09/2026**, múi giờ Asia/Saigon.
+Cập nhật gần nhất: **01/10/2026**, múi giờ Asia/Saigon.
 
 Nhật ký ghi nhận công việc thực tế sau mỗi đợt code. Mục mới nhất nằm trước; kết quả kiểm tra thuộc đợt được ghi, không phải cam kết trạng thái luôn đúng ở các phiên bản sau.
 
@@ -8,12 +8,13 @@ Nhật ký ghi nhận công việc thực tế sau mỗi đợt code. Mục mớ
 
 | Hạng mục | Trạng thái |
 |---|---|
-| Kế hoạch FE và quy tắc phát triển | Đã có `FE_PLAN.md`, `AGENTS.md` |
+| Kế hoạch FE và quy tắc phát triển | Đã có `FE_PLAN.md`, `AGENTS.md`; kế hoạch được đối chiếu hiện trạng ngày 01/10/2026 |
 | Hướng thiết kế | Đã có `DESIGN.md`, đã áp dụng vào trang chủ |
 | React + Vite + Ant Design | Đã tích hợp Ant Design và theme chung |
 | Trang chủ Chanh&Man | Đã triển khai 8 phần nội dung, responsive và các tương tác chính |
 | Tìm kiếm và lọc sản phẩm | Có trên trang chủ và danh mục; giữ tiêu chí trong URL |
 | Xem cấu hình và giỏ hàng | Có hộp xem nhanh, chọn phiên bản và giỏ lưu trên trình duyệt |
+| Trang giỏ hàng /cart | Đã có; dùng chung giỏ với Header/Drawer, đổi số lượng/xóa/thành tiền, trạng thái rỗng/lỗi và cảnh báo tồn kho; chưa nối checkout |
 | Trang danh mục độc lập | Đã có Laptop, Điện thoại, Linh kiện PC, Tất cả; lọc và sắp xếp bằng dữ liệu giả lập |
 | Trang chi tiết độc lập | Đã có /san-pham/:id; ảnh, chính sách, mô tả, chọn phiên bản, nhận xét dùng thử và gợi ý mua cùng |
 | Đăng nhập, đăng ký, hồ sơ | Chưa triển khai; hiện chỉ có thông tin giới thiệu tính năng |
@@ -23,6 +24,78 @@ Nhật ký ghi nhận công việc thực tế sau mỗi đợt code. Mục mớ
 **Lưu ý phạm vi:** bản hiện tại là FE học tập, giá/cấu hình/tồn kho là dữ liệu minh họa, chưa tiếp nhận đơn hàng thực tế. Hoàn thành trang chủ không đồng nghĩa hoàn thành toàn bộ FE.
 
 ## Nhật ký thay đổi
+
+### Đợt 027 — 01/10/2026 — Lưu bản hiện tại lên nhánh main
+
+**Mục tiêu:** commit và đẩy bản hiện tại lên nhánh main của repository riêng tư [Chanh-Man](https://github.com/ManhNguyenNe/Chanh-Man).
+
+**Nội dung bản lưu:** cập nhật FE_PLAN.md và nhật ký; trang /cart, service/hook giỏ, test và ảnh kiểm tra; các chỉnh sửa chính sách/Modal ảnh sản phẩm đã ghi ở đợt 021–022. Không đổi nhánh.
+
+**Kiểm tra trước khi đẩy:** main trên GitHub và local cùng commit 6eb7f94; rà các file thay đổi và mẫu khóa bí mật thông dụng, không tìm thấy chuỗi khớp. Lint/build gần nhất đạt ở đợt 026; kiểm tra toàn bộ giỏ ở đợt 025 đạt. Không chạy lại các kiểm tra này vì không sửa mã nguồn trong đợt lưu bản.
+
+**Bàn giao:** kết quả push và đối chiếu commit local/GitHub được xác minh sau khi commit, báo trong phiên bàn giao; mục này không tự xác nhận push đã thành công.
+
+### Đợt 026 — 01/10/2026 — Bỏ eyebrow ở tiêu đề giỏ hàng
+
+**Đã thực hiện:** bỏ dòng Lựa chọn của bạn khỏi cart-page-heading; xóa CSS eyebrow không còn dùng và bỏ margin phía trên h1, giữ khoảng cách dưới tiêu đề 8px như category-intro.
+
+**File:** [Cart.jsx](./src/pages/Cart.jsx), [CartPage.css](./src/components/cart/CartPage.css).
+
+**Kiểm tra:** lint/build đạt. Trình duyệt xác nhận không còn eyebrow, tiêu đề/mô tả còn hiển thị, h1 có margin-top 0 và không tràn ngang tại 360/640/641/768/1440px. Đã xem ảnh [desktop](./docs/previews/cart-heading-1440.png), [tablet](./docs/previews/cart-heading-768.png), [mobile](./docs/previews/cart-heading-360.png). Không chạy lại test service hoặc toàn bộ luồng giỏ vì chỉ thay nội dung tiêu đề và khoảng cách.
+
+### Đợt 025 — 01/10/2026 — Đồng bộ giao diện giỏ hàng
+
+**Mục tiêu:** chỉnh những khác biệt thị giác giữa /cart và trang danh mục/chi tiết theo DESIGN.md.
+
+**Đã thực hiện:** breadcrumb về 14px, padding đầu trang về 24px; tiêu đề đặt trong card trắng bo 18px, dấu chấm/eyebrow xanh và khoảng cách dùng token chung. Card giỏ/tóm tắt dùng padding 24px desktop, 17px mobile; giảm khoảng đệm cuối trang mobile về 48px. Đơn giá và thành tiền tăng lên 17px. Nút Xóa dùng chung giữa trang giỏ/Drawer có vùng chạm tối thiểu 44 × 44px. Bỏ khai báo flex-wrap trùng; không thay luồng giỏ hoặc dữ liệu.
+
+**File:** [CartPage.css](./src/components/cart/CartPage.css), [CartDrawer.css](./src/components/cart/CartDrawer.css), [Cart.jsx](./src/pages/Cart.jsx), [cart-browser.mjs](./tests/cart-browser.mjs).
+
+**Kiểm tra:** lint/build đạt; test trình duyệt giỏ hiện có đạt, bổ sung kiểm tra kích thước nút Xóa trên trang và Drawer. Không tràn ngang tại 360/640/641/768/833/834/1068/1440px; đổi số lượng, tổng tiền, reload, đồng bộ Header/Drawer, xóa bằng Enter, Escape, giỏ rỗng, lỗi lưu và cảnh báo tồn kho vẫn đạt. Đã xem ảnh [desktop 1440px](./docs/previews/cart-1440.png), [tablet 768px](./docs/previews/cart-768.png), [mobile 360px](./docs/previews/cart-360.png). Không chạy lại test service vì chỉ sửa JSX trình bày và CSS.
+
+**Giới hạn:** xác nhận vùng chạm nút Xóa sau chỉnh sửa; ghi nhận 44px ở đợt 024 chưa phản ánh chiều rộng thực tế trước đó. Checkout vẫn chưa triển khai theo kế hoạch; chưa nghiệm thu toàn bộ FE.
+
+### Đợt 024 — 01/10/2026 — Xây trang giỏ hàng
+
+**Mục tiêu:** hoàn thiện /cart theo FE_PLAN.md, tái sử dụng giỏ hiện có và token DESIGN.md.
+
+**Đã thực hiện:** thêm /cart và /cart/ vào điều hướng hiện tại; breadcrumb, danh sách phiên bản, liên kết sản phẩm, đơn giá/thành tiền, điều chỉnh số lượng, xóa và tóm tắt. Tách CartItems để Drawer/trang dùng chung thao tác; ShopLayout cung cấp cùng useCart cho Header/Drawer/trang. Drawer có liên kết Xem giỏ hàng. Thêm loading/error/retry ở hook; khóa thao tác đang xử lý, lỗi lưu giữ nguyên giỏ. Service trả productId và thông báo giảm số lượng/bỏ phiên bản hết hàng khi đọc. Desktop hai cột, dưới 834px một cột, dưới 641px thu ảnh/padding; vùng chạm tối thiểu 44px. Trạng thái giỏ/loading/error là phần mở rộng theo Known Gaps. Cập nhật FE_PLAN.md theo phần đã hoàn thành.
+
+**File chính:** [Cart.jsx](./src/pages/Cart.jsx), [components/cart](./src/components/cart/), [useCart.js](./src/hooks/useCart.js), [cartService.js](./src/services/cartService.js), [ShopLayout.jsx](./src/layouts/ShopLayout.jsx), [App.jsx](./src/App.jsx).
+
+**Kiểm tra:** lint/build đạt; 11 test catalog/giỏ đạt, gồm tách/gộp phiên bản, tính tiền, số lượng sai, hết hàng, lưu lỗi không mất dữ liệu, dữ liệu hỏng và điều chỉnh tồn kho. Playwright đạt giỏ rỗng, đổi số lượng/tổng tiền, reload, đồng bộ Header/Drawer, điều hướng sản phẩm → Drawer → /cart, xóa bằng Enter, Escape đóng Drawer, lỗi lưu và cảnh báo tồn kho. Không lỗi JavaScript hoặc tràn ngang ở 360/640/641/768/833/834/1068/1440px. Đã xem ảnh desktop/mobile: [1440px](./docs/previews/cart-1440.png), [768px](./docs/previews/cart-768.png), [360px](./docs/previews/cart-360.png). Test lưu tại [cart-service.test.js](./tests/cart-service.test.js), [cart-browser.mjs](./tests/cart-browser.mjs).
+
+**Giới hạn:** nút Tiếp tục đặt hàng disabled và giải thích vì checkout/auth chưa có; không tạo route checkout giả. Giá lấy từ catalog hiện tại, chưa có so sánh giá lúc thêm giỏ hoặc báo giá đặt hàng. Chưa nghiệm thu toàn bộ FE; tiếp tục tài khoản/checkout theo kế hoạch. Không thêm dependency.
+
+### Đợt 023 — 01/10/2026 — Đồng bộ kế hoạch FE với mã nguồn
+
+**Mục tiêu:** cập nhật kế hoạch theo FE hiện tại, phân biệt chức năng đã triển khai với phần cần làm tiếp.
+
+**Đã thực hiện:** cập nhật hiện trạng các giai đoạn và từng route; dùng URL /san-pham/:id cùng các trang danh mục hiện có. Ghi nhận ShopLayout, Ant Design, Xem thêm theo nhóm 20, service catalog/giỏ và giới hạn của tài khoản, đặt mua, nhận xét dùng thử. Phân biệt hợp đồng service/dữ liệu hiện có với mô hình mục tiêu; bổ sung thứ tự hoàn thiện mua hàng, admin và nghiệm thu. Giữ checklist chưa nghiệm thu; ghi trang liên hệ/chính sách riêng là đề xuất bổ sung.
+
+**File:** [FE_PLAN.md](./FE_PLAN.md), [PROGRESS.md](./PROGRESS.md).
+
+**Kiểm tra:** đối chiếu router hiện tại, danh sách page, package.json, hook/service, dữ liệu mẫu, test catalog và nhật ký các đợt trước; rà diff tài liệu. Không chạy lại lint/build hoặc kiểm tra trình duyệt vì chỉ sửa Markdown. Giữ nguyên các thay đổi mã nguồn và ảnh xem trước đã có trong workspace.
+
+**Còn lại:** chưa triển khai thêm page hoặc chức năng; tiếp tục theo thứ tự trong FE_PLAN.md. Các kết quả kiểm tra giao diện ở đợt trước là lịch sử, không phải nghiệm thu mới.
+
+### Đợt 022 — 30/09/2026 — Thống nhất cửa sổ xem ảnh
+
+**Đã thực hiện:** Modal ảnh căn giữa, khung tối đa 960 × 720px và tự thu theo viewport, chừa 16px mỗi cạnh. Chiều cao không phụ thuộc ảnh; ảnh dùng object-fit contain trong phần thân co giãn, giữ tỷ lệ và không cắt ảnh. Header riêng, tiêu đề dài có ellipsis, nút đóng tối thiểu 44px. Dùng classNames semantic của Ant Design, chỉ tác động Modal ảnh.
+
+**File:** [ProductDetails.jsx](./src/components/products/ProductDetails.jsx), [ProductDetails.css](./src/components/products/ProductDetails.css).
+
+**Kiểm tra:** lint/build đạt. Playwright mở lần lượt hai ảnh iPhone có tỷ lệ khác nhau: kích thước Modal không đổi ở 1440×900, 834×800, 360×640 và 844×390; toàn bộ khung/ảnh trong viewport, không có nội dung tràn dọc; Escape đóng được. Đã xem ảnh desktop/mobile/ngang: [Desktop](./docs/previews/image-modal-1440.png), [Mobile](./docs/previews/image-modal-360.png), [Màn hình ngang](./docs/previews/image-modal-844.png). Không thay logic dữ liệu.
+
+
+### Đợt 021 — 30/09/2026 — Chính sách trải ngang khối thông tin
+
+**Đã thực hiện:** cho pdp-policies chiếm toàn bộ hai cột gallery; chia bốn nút thành bốn cột bằng nhau trên desktop. Dưới 834px còn hai cột, dưới 641px một cột, giữ vùng chạm 44px và token hiện có.
+
+**File:** [ProductDetails.css](./src/components/products/ProductDetails.css).
+
+**Kiểm tra:** lint/build đạt. Playwright xác nhận số hàng đúng ở 1440/834/833/640/360px, không tràn ngang, Enter mở chính sách bảo hành. Đã xem ảnh desktop/mobile: [Desktop](./docs/previews/policies-horizontal-1440.png), [Mobile](./docs/previews/policies-horizontal-360.png). Khởi động lại Vite do server cũ đã dừng; không thay logic dữ liệu.
+
 
 ### Đợt 020 — 30/09/2026 — Tạo repository GitHub Chanh-Man
 
@@ -289,10 +362,3 @@ Mục này được ghi bổ sung ngày 09/09/2026, dựa trên code hiện có,
 **Ảnh xem trước:** [Màn hình đầu trang](./docs/previews/home-hero.png), [Desktop](./docs/previews/home-desktop.png), [Tablet](./docs/previews/home-tablet.png), [Mobile](./docs/previews/home-mobile.png).
 
 **Chưa thực hiện / hướng tiếp tục:** xây các trang danh sách và chi tiết riêng, tài khoản, checkout, đơn hàng và quản trị theo [FE_PLAN.md](./FE_PLAN.md). Database, Auth và tích hợp Supabase thực hiện sau khi hoàn thiện FE theo phạm vi thống nhất.
-
-
-
-
-
-
-

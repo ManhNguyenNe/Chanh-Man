@@ -8,7 +8,8 @@ import { categoryUrl } from '../utils/categoryRoutes'
 const ProductDialog = lazy(() => import('../components/products/ProductDialog'))
 const CartDrawer = lazy(() => import('../components/cart/CartDrawer'))
 export default function ShopLayout({ children, query = '', onSearch }) {
-  const { cart, addItem, updateQuantity, removeItem } = useCart()
+  const cartState = useCart()
+  const { cart, addItem, updateQuantity, removeItem } = cartState
   const [selected, setSelected] = useState(null)
   const [cartOpen, setCartOpen] = useState(false)
   const [info, setInfo] = useState(null)
@@ -28,7 +29,7 @@ export default function ShopLayout({ children, query = '', onSearch }) {
         cartCount={cart.count}
       />
       <main id="main" tabIndex={-1}>
-        {children({ onSelect: setSelected, onInfo: setInfo, onAdd: add })}
+        {children({ onSelect: setSelected, onInfo: setInfo, onAdd: add, cartState })}
       </main>
       <Footer onCategory={(id) => window.location.assign(categoryUrl(id))} onInfo={setInfo} />
       <Suspense

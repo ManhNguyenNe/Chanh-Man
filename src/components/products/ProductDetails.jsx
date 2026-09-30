@@ -108,7 +108,18 @@ export default function ProductDetails({ product, related, onAdd, onInfo, onSele
       </section>
     </div>
     <Modal open={specsOpen} onCancel={() => setSpecsOpen(false)} footer={null} title="Thông số kỹ thuật" width={720}>{specs}</Modal>
-    <Modal open={preview} onCancel={() => setPreview(false)} footer={null} title={product.name} width={960}><img src={images[imageIndex]} alt={product.name} width="800" height="512" className="pdp-preview" /></Modal>
+    <Modal
+      open={preview}
+      onCancel={() => setPreview(false)}
+      footer={null}
+      title={product.name}
+      width="min(960px, calc(100vw - 32px))"
+      centered
+      style={{ paddingBottom: 0 }}
+      classNames={{ container: 'pdp-preview-container', header: 'pdp-preview-header', body: 'pdp-preview-body', title: 'pdp-preview-title', close: 'pdp-preview-close' }}
+    >
+      <img src={images[imageIndex]} alt={product.name} width="800" height="512" className="pdp-preview" />
+    </Modal>
     <Modal open={buyOpen} onCancel={() => { if (!busy) setBuyOpen(false) }} title="Kiểm tra lựa chọn của bạn" footer={<Button type="primary" disabled={!variant.stock} loading={busy} onClick={add}>Lưu lựa chọn vào giỏ</Button>}><div className="pdp-order"><h3>{product.name}</h3><p>{variant.label}</p><strong>{formatMoney(variant.price)}</strong><p>Chanh&Man chưa tiếp nhận đơn hàng thực tế. Bạn có thể lưu lựa chọn vào giỏ để tiếp tục trải nghiệm.</p>{error && <p role="alert">{error}</p>}</div></Modal>
     <Modal open={reviewOpen} onCancel={() => setReviewOpen(false)} title="Viết nhận xét dùng thử" footer={null}>
       <Form form={form} layout="vertical" onFinish={(values) => { setReviews([...reviews, { ...values, name: values.name.trim(), content: values.content.trim() }]); setReviewOpen(false); form.resetFields() }}>
