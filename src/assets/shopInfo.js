@@ -2,8 +2,8 @@ export const shopInfo = {
   account: {
     title: 'Tài khoản Chanh&Man',
     paragraphs: [
-      'Tính năng tài khoản đang được chuẩn bị. Hiện tại, bạn có thể khám phá sản phẩm, chọn cấu hình và lưu giỏ hàng ngay trên trình duyệt.',
-      'Đăng nhập, lịch sử mua hàng và thanh toán sẽ được bổ sung trong giai đoạn tiếp theo.',
+      'Đăng nhập và đăng ký đang dùng tài khoản giả lập. Bạn có thể khám phá sản phẩm, chọn cấu hình và giữ giỏ hàng khi đăng nhập.',
+      'Bạn có thể cập nhật hồ sơ, tạo đơn COD dùng thử và xem danh sách, chi tiết đơn của mình.',
     ],
   },
   advice: {
@@ -46,7 +46,8 @@ export const shopInfo = {
     title: 'Dữ liệu của bạn',
     paragraphs: [
       'Bản mẫu lưu giỏ hàng trên chính trình duyệt để giữ lựa chọn khi tải lại trang. Bạn có thể xóa từng sản phẩm trong giỏ hoặc xóa dữ liệu trang web trong trình duyệt.',
-      'Hiện chưa có đăng ký tài khoản, thu thập thông tin thanh toán hoặc gửi giỏ hàng lên máy chủ.',
+      'Tài khoản giả lập chỉ lưu hồ sơ minh họa và phiên trong tab trình duyệt, không lưu mật khẩu. Chưa gửi dữ liệu tài khoản hoặc giỏ hàng lên máy chủ; không nhập thông tin cá nhân thật.',
+      'Đơn dùng thử và thông tin giao hàng minh họa được lưu trên trình duyệt, không gửi tới cửa hàng. Xóa dữ liệu trang web sẽ xóa đơn dùng thử và khôi phục tồn kho minh họa.',
     ],
   },
 }

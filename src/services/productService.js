@@ -1,4 +1,11 @@
 import { products, categories, needs } from './mock/catalog.js'
+import { orderedQuantities } from './mock/orders.js'
+function catalog() {
+  const purchased = orderedQuantities()
+  return products.map((product) => ({ ...product, variants: product.variants.map((variant) => ({ ...variant,
+    stock: Math.max(0, variant.stock - (purchased.get(variant.id) || 0)),
+  })) }))
+}
 const normalize = (text) =>
   text
     .normalize('NFD')
@@ -41,7 +48,7 @@ export async function listProducts({
 } = {}) {
   await delay(signal)
   const terms = normalize(q.trim()).split(/\s+/).filter(Boolean)
-  const matches = products.filter((product) => {
+  const matches = catalog().filter((product) => {
     const text = normalize(
       `${product.name} ${product.brand} ${product.specs.join(' ')} ${categories.find((item) => item.id === product.category)?.name}`,
     )
@@ -69,7 +76,7 @@ export async function listProducts({
 }
 export async function getProduct(id) {
   await delay()
-  const product = products.find((item) => item.id === id)
+  const product = catalog().find((item) => item.id === id)
   if (!product)
     throw Object.assign(new Error('Sản phẩm này hiện không có trong danh mục.'), {
       code: 'NOT_FOUND',
@@ -77,7 +84,7 @@ export async function getProduct(id) {
   return structuredClone(product)
 }
 export function findVariant(variantId) {
-  for (const product of products) {
+  for (const product of catalog()) {
     const variant = product.variants.find((item) => item.id === variantId)
     if (variant) return { product, variant }
   }
@@ -97,7 +104,7 @@ function matchesPrice(product, value) {
 }
 export async function getCategoryFilters(category, { signal } = {}) {
   await delay(signal)
-  const items = products.filter((product) => category === 'all' || product.category === category)
+  const items = catalog().filter((product) => category === 'all' || product.category === category)
   return structuredClone({
     category: categories.find((item) => item.id === category) || {
       id: 'all',

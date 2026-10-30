@@ -48,6 +48,7 @@
   align-items: center;
   gap: 14px;
 }
+.nav-orders { display: inline-flex; align-items: center; min-height: 44px; color: var(--dark-muted); font-size: 12px; white-space: nowrap; }
 .nav-icon {
   position: relative;
   display: grid;
@@ -166,6 +167,7 @@
 }
 @media (max-width: 833px) {
   .desktop-links,
+  .nav-orders,
   .account-button,
   .nav-advice {
     display: none;

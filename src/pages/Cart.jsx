@@ -33,8 +33,8 @@ export default function Cart() {
                 <div><dt>Tạm tính</dt><dd aria-live="polite">{formatMoney(cart.total)}</dd></div>
                 <div><dt>Phí giao hàng</dt><dd>Chưa tính</dd></div></dl>
               <p className="surface-note">Phí giao hàng sẽ được hiển thị tại bước đặt hàng.</p>
-              <Button type="primary" block disabled aria-describedby="checkout-note">Tiếp tục đặt hàng</Button>
-              <p id="checkout-note" className="surface-note">Chức năng đặt hàng đang được chuẩn bị. Giỏ hàng được lưu trên trình duyệt; chưa tiếp nhận đơn hàng hoặc thanh toán.</p>
+              <Button type="primary" block href="/checkout" aria-describedby="checkout-note">Tiếp tục đặt hàng</Button>
+              <p id="checkout-note" className="surface-note">Đăng nhập và kiểm tra thông tin giao hàng để tạo đơn COD dùng thử. Chưa có giao hàng hoặc thanh toán thực tế.</p>
             </aside>
           </div> : <section className="cart-page-panel empty-cart">
             <Empty description="Giỏ hàng của bạn đang trống." />

@@ -22,7 +22,7 @@ try {
   assert.match(await page.locator('.cart-page-summary').innerText(), /104.960.000/)
   await page.reload()
   await page.getByRole('button', { name: 'Giỏ hàng, 4 sản phẩm' }).waitFor()
-  assert(await page.getByRole('button', { name: 'Tiếp tục đặt hàng' }).isDisabled())
+  assert.equal(await page.getByRole('link', { name: 'Tiếp tục đặt hàng' }).getAttribute('href'), '/checkout')
   for (const width of [360, 640, 641, 768, 833, 834, 1068, 1440]) {
     await page.setViewportSize({ width, height: 900 })
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `overflow ${width}`)

@@ -1,27 +1,23 @@
 import { findVariant } from './productService.js'
 const key = 'chanh-man:cart:v1'
 function readItems(notices = []) {
-  try {
-    const data = JSON.parse(localStorage.getItem(key) || '[]')
-    if (!Array.isArray(data)) return []
-    const merged = new Map()
-    for (const item of data) {
-      const match = findVariant(item?.variantId)
-      if (!match || match.variant.stock < 1) {
-        notices.push('Một phiên bản không còn bán hoặc đã hết hàng được bỏ khỏi giỏ.')
-      } else if (Number.isInteger(item.quantity) && item.quantity > match.variant.stock) {
-        notices.push(`${match.product.name}: số lượng được giảm về ${match.variant.stock} theo tồn kho hiện tại.`)
-      }
-      if (match && Number.isInteger(item.quantity) && item.quantity > 0 && match.variant.stock > 0)
-        merged.set(
-          item.variantId,
-          Math.min(match.variant.stock, (merged.get(item.variantId) || 0) + item.quantity),
-        )
+  let raw
+  try { raw = localStorage.getItem(key) } catch { throw new Error('Không thể đọc giỏ hàng. Vui lòng cho phép lưu trữ và thử lại.') }
+  let data
+  try { data = JSON.parse(raw || '[]') } catch { return [] }
+  if (!Array.isArray(data)) return []
+  const merged = new Map()
+  for (const item of data) {
+    const match = findVariant(item?.variantId)
+    if (!match || match.variant.stock < 1) {
+      notices.push('Một phiên bản không còn bán hoặc đã hết hàng được bỏ khỏi giỏ.')
+    } else if (Number.isInteger(item.quantity) && item.quantity > match.variant.stock) {
+      notices.push(`${match.product.name}: số lượng được giảm về ${match.variant.stock} theo tồn kho hiện tại.`)
     }
-    return [...merged].map(([variantId, quantity]) => ({ variantId, quantity }))
-  } catch {
-    return []
+    if (match && Number.isInteger(item.quantity) && item.quantity > 0 && match.variant.stock > 0)
+      merged.set(item.variantId, Math.min(match.variant.stock, (merged.get(item.variantId) || 0) + item.quantity))
   }
+  return [...merged].map(([variantId, quantity]) => ({ variantId, quantity }))
 }
 function summarize(items) {
   const lines = items.map((item) => {
@@ -77,4 +73,21 @@ export async function updateQuantity(variantId, quantity) {
 }
 export async function removeItem(variantId) {
   return save(readItems().filter((item) => item.variantId !== variantId))
+}
+
+/** Clear only the exact purchased selection; preserve a cart changed in another tab. */
+export async function clearPurchasedCart(items) {
+  let current
+  try {
+    current = JSON.parse(localStorage.getItem(key) || '[]')
+    if (!Array.isArray(current) || current.some((item) => typeof item?.variantId !== 'string' || !Number.isInteger(item.quantity) || item.quantity < 1)) throw new Error('invalid cart')
+  } catch { throw new Error('Đơn đã được tạo nhưng chưa đọc được giỏ để dọn. Giỏ được giữ lại để bạn kiểm tra.') }
+  const selection = (lines) => {
+    const merged = new Map()
+    for (const item of lines) merged.set(item.variantId, (merged.get(item.variantId) || 0) + item.quantity)
+    return JSON.stringify([...merged].sort(([a], [b]) => a.localeCompare(b)))
+  }
+  if (selection(current) !== selection(items)) return false
+  save([])
+  return true
 }

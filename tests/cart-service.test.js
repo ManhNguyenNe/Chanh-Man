@@ -6,7 +6,7 @@ test('cart preserves variants, totals and stored data on failed writes', async (
   let stored = '[]'
   let blocked = false
   globalThis.localStorage = {
-    getItem: () => stored,
+    getItem: (key) => key === 'chanh-man:cart:v1' ? stored : null,
     setItem: (_key, value) => { if (blocked) throw new Error('blocked'); stored = value },
   }
   try {

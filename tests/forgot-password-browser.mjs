@@ -1,0 +1,87 @@
+import { createRequire } from 'node:module'
+import assert from 'node:assert/strict'
+const require = createRequire(process.env.CODEX_NODE_PACKAGES + '/package.json')
+const { chromium } = require('playwright')
+const browser = await chromium.launch({ channel: 'msedge', headless: true })
+const base = 'http://127.0.0.1:5173'
+try {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  const errors = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  const email = () => page.getByLabel('Email đăng ký', { exact: true })
+  const submit = () => page.getByRole('button', { name: 'Gửi yêu cầu khôi phục', exact: true })
+  const result = () => page.getByRole('heading', { name: 'Yêu cầu dùng thử đã hoàn tất', exact: true })
+  await page.goto(`${base}/login?next=%2Faccount%2Forders`)
+  await page.evaluate(() => localStorage.setItem('chanh-man:cart:v1', JSON.stringify([{ variantId: 'air-13-256', quantity: 1 }])))
+  await page.getByRole('link', { name: 'Quên mật khẩu?', exact: true }).click()
+  await page.waitForURL((url) => url.pathname === '/forgot-password' && url.searchParams.get('next') === '/account/orders')
+  await email().waitFor()
+  assert.equal(await page.title(), 'Quên mật khẩu | Chanh&Man')
+  await submit().click()
+  await page.locator('.ant-form-item-explain-error').filter({ hasText: 'Vui lòng nhập email.' }).waitFor()
+  assert(await email().evaluate((element) => document.activeElement === element))
+  await email().fill('invalid')
+  await submit().click()
+  await page.locator('.ant-form-item-explain-error').filter({ hasText: 'Email chưa đúng định dạng.' }).waitFor()
+  assert.equal(await result().count(), 0)
+  await email().fill('customer@chanhman.test')
+  for (const width of [360, 640, 641, 768, 833, 834, 1068, 1440]) {
+    await page.setViewportSize({ width, height: 900 })
+    await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }) })
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `forgot overflow ${width}`)
+    const box = await submit().boundingBox()
+    assert(box.width >= 44 && box.height >= 44)
+    if ([360, 768, 1440].includes(width)) await page.screenshot({ path: `docs/previews/forgot-password-${width}.png`, fullPage: true })
+  }
+  await page.evaluate(() => {
+    const get = Storage.prototype.getItem
+    window.restoreRecoveryRead = () => { Storage.prototype.getItem = get }
+    Storage.prototype.getItem = function (key) { if (key === 'chanh-man:auth-profiles:v1') throw new Error('blocked'); return get.call(this, key) }
+  })
+  await submit().click()
+  await page.getByRole('alert').filter({ hasText: 'Không thể lưu hoặc đọc phiên đăng nhập.' }).waitFor()
+  assert.equal(await email().inputValue(), 'customer@chanhman.test')
+  assert.equal(await result().count(), 0)
+  await page.evaluate(() => window.restoreRecoveryRead())
+  const stored = await page.evaluate(() => ({ session: { ...sessionStorage }, cart: localStorage.getItem('chanh-man:cart:v1') }))
+  await page.evaluate(() => {
+    const get = Storage.prototype.getItem
+    window.recoveryLookups = 0
+    Storage.prototype.getItem = function (key) { if (key === 'chanh-man:auth-profiles:v1') window.recoveryLookups++; return get.call(this, key) }
+    const form = document.querySelector('.auth-panel form')
+    form.requestSubmit(); form.requestSubmit()
+  })
+  await page.locator('.auth-panel input[disabled]').waitFor()
+  await result().waitFor()
+  assert.equal(await page.evaluate(() => window.recoveryLookups), 1, 'duplicate submit performs one mock request')
+  assert(await result().evaluate((element) => document.activeElement === element))
+  const message = await page.getByRole('status').filter({ hasText: 'Nếu email này có tài khoản' }).innerText()
+  assert.deepEqual(await page.evaluate(() => ({ session: { ...sessionStorage }, cart: localStorage.getItem('chanh-man:cart:v1') })), stored)
+  assert.equal(await page.getByRole('link', { name: 'Về trang đăng nhập', exact: true }).getAttribute('href'), '/login?next=%2Faccount%2Forders')
+  await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }) })
+  await page.screenshot({ path: 'docs/previews/forgot-password-result-1440.png', fullPage: true })
+  await page.getByRole('button', { name: 'Gửi yêu cầu khác', exact: true }).click()
+  await email().fill('unknown@example.test')
+  await email().press('Enter')
+  await result().waitFor()
+  assert.equal(await page.getByRole('status').filter({ hasText: 'Nếu email này có tài khoản' }).innerText(), message)
+  await page.getByRole('link', { name: 'Về trang đăng nhập', exact: true }).click()
+  await page.getByLabel('Email', { exact: true }).fill('customer@chanhman.test')
+  await page.getByLabel('Mật khẩu', { exact: true }).fill('Demo123!')
+  await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click()
+  await page.waitForURL(`${base}/account/orders`)
+  await page.getByText('Bạn chưa có đơn hàng nào.', { exact: true }).waitFor()
+  const signed = await page.evaluate(() => ({ ...sessionStorage }))
+  await page.goto(`${base}/forgot-password/`)
+  await email().fill('customer@chanhman.test')
+  await submit().click()
+  await result().waitFor()
+  assert.deepEqual(await page.evaluate(() => ({ ...sessionStorage })), signed, 'signed-in recovery preserves session')
+  await page.reload()
+  await email().waitFor()
+  await page.goto(`${base}/forgot-password?next=https%3A%2F%2Fevil.example`)
+  await email().waitFor()
+  assert.equal(await page.getByRole('link', { name: 'Về trang đăng nhập', exact: true }).getAttribute('href'), '/login?next=%2Fcart')
+  assert.deepEqual(errors, [])
+  console.log('Forgot password browser passed: login entry/return, validation/focus, pending/duplicate guard, generic known/unknown result, read failure/retry, preserved session/cart, signed-in access, reload/trailing slash, safe next, keyboard and responsive.')
+} finally { await browser.close() }

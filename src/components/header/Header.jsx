@@ -3,8 +3,9 @@ import { Drawer, Input } from 'antd'
 import Icon from '../Icon'
 import './Header.css'
 
-export default function Header({ onCategory, onSearch, onCart, onInfo, cartCount, query }) {
+export default function Header({ onCategory, onSearch, onCart, onInfo, cartCount, query, user, accountLoading }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const ordersHref = user ? '/account/orders' : '/login?next=%2Faccount%2Forders'
   const links = [
     { id: 'laptop', name: 'Laptop' },
     { id: 'phone', name: 'Điện thoại' },
@@ -41,9 +42,11 @@ export default function Header({ onCategory, onSearch, onCart, onInfo, cartCount
             <a href="/#ho-tro">Hỗ trợ</a>
           </nav>
           <div className="nav-actions">
+            <a className="nav-orders" href={ordersHref}>Đơn hàng</a>
             <button
               className="nav-icon account-button"
-              aria-label="Tài khoản"
+              aria-label={user ? `Tài khoản của ${user.displayName}` : 'Tài khoản'}
+              disabled={accountLoading}
               onClick={() => onInfo('account')}
             >
               <Icon name="user" />
@@ -123,6 +126,10 @@ export default function Header({ onCategory, onSearch, onCart, onInfo, cartCount
             Tài khoản
             <Icon name="user" />
           </button>
+          <a href={ordersHref} onClick={() => setMenuOpen(false)}>
+            Đơn hàng của tôi
+            <Icon name="chevron" />
+          </a>
         </nav>
       </Drawer>
     </header>
